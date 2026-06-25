@@ -1,0 +1,46 @@
+# ====================================================================
+# .NET Core Build and Deployment Outputs
+# ====================================================================
+[Bb]in/
+[Oo]bj/
+[Log]/
+[Log]s/
+*.proto.bin
+
+# ====================================================================
+# IDE and Editor Workspace Configurations (VS Code / JetBrains / VS)
+# ====================================================================
+# VS Code user workspace files
+.vscode/
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# JetBrains Rider / Resharper
+.idea/
+*.sln.iml
+
+# Visual Studio temporary files
+.vs/
+AppPackages/
+BundleArtifacts/
+
+# ====================================================================
+# App Secrets, Certificates, and Environment Configs (NEVER COMMIT)
+# ====================================================================
+# Local user secrets token pointer
+.microsoft.dotnet.secretmanager/
+
+# Application configuration overrides for local machine
+appsettings.Development.json
+appsettings.Local.json
+
+# Development SSL certificates
+*.pfx
+*.pem
+
+# ====================================================================
+# Operating System Garbage Files
+# ====================================================================
+.DS_Store
+Thumbs.db
