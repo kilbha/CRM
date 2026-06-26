@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using CRM.Infrastructure.Authentication;
+using CRM.Infrastructure.Configuration;
 namespace CRM.Infrastructure;
 
 public static class DependencyInjection
@@ -68,6 +69,12 @@ public static class DependencyInjection
 
         services.AddScoped<IJwtTokenGenerator,
                   JwtTokenGenerator>();
+
+
+        services.AddScoped<IdentitySeeder>();
+
+        services.Configure<SeedDataSettings>(
+            configuration.GetSection(SeedDataSettings.SectionName));
 
 
         return services;

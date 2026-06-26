@@ -1,4 +1,6 @@
 using CRM.Infrastructure;
+using CRM.Infrastructure.Identity;
+using CRM.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +29,9 @@ if (app.Environment.IsDevelopment())
         options.RoutePrefix = "swagger"; // Access it at /swagger
     });
 }
+
+// Seed the database with initial data
+await app.SeedDatabaseAsync();
 
 app.UseSwagger();
 

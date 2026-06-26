@@ -1,3 +1,5 @@
+using CRM.Infrastructure.Identity;
+
 namespace CRM.Infrastructure.Authentication;
 
 public class JwtTokenGenerator
