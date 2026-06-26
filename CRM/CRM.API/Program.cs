@@ -12,7 +12,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddSwaggerGen();
+// builder.Services.AddSwaggerGen();
 
 builder.Services.AddInfrastructure(builder.Configuration);
 
@@ -23,19 +23,19 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     // Connects Swagger UI to the native .NET 9 OpenAPI JSON endpoint
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/openapi/v1.json", "CRM API v1");
-        options.RoutePrefix = "swagger"; // Access it at /swagger
-    });
+    // app.UseSwaggerUI(options =>
+    // {
+    //     options.SwaggerEndpoint("/openapi/v1.json", "CRM API v1");
+    //     options.RoutePrefix = "swagger"; // Access it at /swagger
+    // });
 }
 
 // Seed the database with initial data
 await app.SeedDatabaseAsync();
 
-app.UseSwagger();
+// app.UseSwagger();
 
-app.UseSwaggerUI();
+// app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 

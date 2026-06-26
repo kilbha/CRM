@@ -46,3 +46,4 @@ appsettings.Local.json
 Thumbs.db
 CRM/azuredatastudio.deb
 CRM/CRM.Infrastructure/Persistence/Migrations
+CRM/CRM.Application/Features/Authentication/Register/TESTCASES

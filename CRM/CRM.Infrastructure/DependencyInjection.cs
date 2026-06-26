@@ -9,6 +9,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using CRM.Infrastructure.Authentication;
 using CRM.Infrastructure.Configuration;
+using CRM.Application.Features.Authentication.Register;
+
 namespace CRM.Infrastructure;
 
 public static class DependencyInjection
@@ -75,6 +77,9 @@ public static class DependencyInjection
 
         services.Configure<SeedDataSettings>(
             configuration.GetSection(SeedDataSettings.SectionName));
+
+
+        services.AddScoped<IAuthService, AuthService>();
 
 
         return services;
