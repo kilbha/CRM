@@ -9,3 +9,6 @@ docker run \
 sudo snap install azuredatastudio
 
 
+dotnet ef database update \
+--project CRM.Infrastructure \
+--startup-project CRM.API

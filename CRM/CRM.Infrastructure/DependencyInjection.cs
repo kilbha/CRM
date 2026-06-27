@@ -9,7 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using CRM.Infrastructure.Authentication;
 using CRM.Infrastructure.Configuration;
-using CRM.Application.Features.Authentication.Register;
+using CRM.Application.Features.Authentication.Interfaces;
 
 namespace CRM.Infrastructure;
 

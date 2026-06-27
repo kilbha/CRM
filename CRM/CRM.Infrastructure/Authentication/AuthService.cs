@@ -1,6 +1,9 @@
 using CRM.Application.Features.Authentication.Register;
+using CRM.Application.Features.Authentication.Login;
+using CRM.Application.Features.Authentication.Interfaces;
 using CRM.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
+using CRM.Shared.Exceptions;
 
 namespace CRM.Infrastructure.Authentication;
 
@@ -8,13 +11,16 @@ public class AuthService : IAuthService
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<ApplicationRole> _roleManager;
+    private readonly IJwtTokenGenerator _jwtTokenGenerator;
 
     public AuthService(
         UserManager<ApplicationUser> userManager,
-        RoleManager<ApplicationRole> roleManager)
+        RoleManager<ApplicationRole> roleManager,
+        IJwtTokenGenerator jwtTokenGenerator)
     {
         _userManager = userManager;
         _roleManager = roleManager;
+        _jwtTokenGenerator = jwtTokenGenerator;
     }
 
     public async Task<RegisterResponse> RegisterAsync(RegisterRequest request)
@@ -43,7 +49,7 @@ public class AuthService : IAuthService
 
         if (existingUser != null)
         {
-            throw new Exception("Email already exists.");
+            throw new DuplicateResourceException("Email already exists.");
         }
     }
 
@@ -53,7 +59,7 @@ public class AuthService : IAuthService
 
         if (!roleExists)
         {
-            throw new Exception($"Role '{role}' does not exist.");
+            throw new NotFoundException($"Role '{role}' does not exist.");
         }
     }
 
@@ -101,4 +107,81 @@ public class AuthService : IAuthService
             throw new Exception(errors);
         }
     }
+
+    public async Task<LoginResponse> LoginAsync(LoginRequest request)
+    {
+        var user = await GetValidatedUserAsync(request);
+
+        var roles = await GetUserRolesAsync(user);
+
+        var jwt = _jwtTokenGenerator.GenerateToken(user, roles);
+
+        await UpdateLastLoginAsync(user);
+
+        return CreateLoginResponse(user, roles, jwt);
+    }
+
+    private async Task<ApplicationUser> GetValidatedUserAsync(
+    LoginRequest request)
+    {
+        var user =
+            await _userManager.FindByEmailAsync(request.Email);
+
+        if (user == null)
+        {
+            throw new UnauthorizedException(
+                "Invalid email or password.");
+        }
+
+        if (!user.IsActive)
+        {
+            throw new ForbiddenException(
+                "User account is inactive.");
+        }
+
+        var valid =
+            await _userManager.CheckPasswordAsync(
+                user,
+                request.Password);
+
+        if (!valid)
+        {
+            throw new UnauthorizedException(
+                "Invalid email or password.");
+        }
+
+        return user;
+    }
+
+    private async Task<IList<string>> GetUserRolesAsync(
+    ApplicationUser user)
+    {
+        return await _userManager.GetRolesAsync(user);
+    }
+
+    private async Task UpdateLastLoginAsync(
+    ApplicationUser user)
+    {
+        user.LastLoginAt = DateTime.UtcNow;
+
+        await _userManager.UpdateAsync(user);
+    }
+
+    private static LoginResponse CreateLoginResponse(
+    ApplicationUser user,
+    IList<string> roles,
+    JwtTokenResult jwt)
+    {
+        return new LoginResponse
+        {
+            Token = jwt.Token,
+
+            ExpiresAt = jwt.ExpiresAt,
+
+            Email = user.Email!,
+
+            Roles = roles
+        };
+    }
+
 }

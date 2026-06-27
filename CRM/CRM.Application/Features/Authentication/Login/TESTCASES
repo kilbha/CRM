@@ -1,0 +1,12 @@
+| Scenario               | Expected         |
+| ---------------------- | ---------------- |
+| Correct email/password | 200 OK + JWT     |
+| Wrong password         | 401 Unauthorized |
+| Unknown email          | 401 Unauthorized |
+| Inactive user          | 403 Forbidden    |
+
+
+
+RefreshToken
+RefreshTokenExpiry
+

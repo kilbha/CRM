@@ -37,6 +37,8 @@ await app.SeedDatabaseAsync();
 
 // app.UseSwaggerUI();
 
+app.UseGlobalExceptionMiddleware();
+
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
