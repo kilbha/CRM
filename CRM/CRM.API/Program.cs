@@ -1,6 +1,7 @@
 using CRM.Infrastructure;
 using CRM.Infrastructure.Identity;
 using CRM.API.Extensions;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +15,17 @@ builder.Services.AddSwaggerDocumentation();
 
 builder.Services.AddInfrastructure(builder.Configuration);
 
+// Logger configuration
+builder.Host.UseSerilog((context, services, configuration) =>
+{
+    configuration.ReadFrom.Configuration(context.Configuration);
+});
+
+
 var app = builder.Build();
+
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
