@@ -2,6 +2,8 @@ using CRM.Application.Features.Authentication.Register;
 using CRM.Application.Features.Authentication.Login;
 using CRM.Application.Features.Authentication.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+
 
 [ApiController]
 [Route("api/auth")]
@@ -15,6 +17,7 @@ public class AuthController : ControllerBase
         _authService = authService;
     }
 
+    // [Authorize(Policy = "RequireAdmin")]
     [HttpPost("register")]
     public async Task<IActionResult> Register(
         RegisterRequest request)

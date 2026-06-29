@@ -10,6 +10,8 @@ using System.Text;
 using CRM.Infrastructure.Authentication;
 using CRM.Infrastructure.Configuration;
 using CRM.Application.Features.Authentication.Interfaces;
+using MyIdentityConstants = CRM.Infrastructure.Identity.IdentityConstants;
+
 
 namespace CRM.Infrastructure;
 
@@ -80,6 +82,35 @@ public static class DependencyInjection
 
 
         services.AddScoped<IAuthService, AuthService>();
+
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy(
+                "RequireSuperAdmin",
+                policy =>
+                    policy.RequireRole(
+                        MyIdentityConstants.SuperAdmin));
+
+            options.AddPolicy(
+                "RequireAdmin",
+                policy =>
+                    policy.RequireRole(
+                        MyIdentityConstants.Admin,
+                        MyIdentityConstants.SuperAdmin));
+
+            options.AddPolicy(
+                "RequireSales",
+                policy =>
+                    policy.RequireRole(
+                        MyIdentityConstants.SalesManager,
+                        MyIdentityConstants.SalesExecutive));
+
+            options.AddPolicy(
+                "RequireSupport",
+                policy =>
+                    policy.RequireRole(
+                        MyIdentityConstants.SupportExecutive));
+        });
 
 
         return services;
