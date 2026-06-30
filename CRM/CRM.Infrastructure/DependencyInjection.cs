@@ -11,7 +11,7 @@ using CRM.Infrastructure.Authentication;
 using CRM.Infrastructure.Configuration;
 using CRM.Application.Features.Authentication.Interfaces;
 using MyIdentityConstants = CRM.Infrastructure.Identity.IdentityConstants;
-
+using CRM.Application.Common.Authorization;
 
 namespace CRM.Infrastructure;
 
@@ -86,27 +86,27 @@ public static class DependencyInjection
         services.AddAuthorization(options =>
         {
             options.AddPolicy(
-                "RequireSuperAdmin",
+                AuthorizationPolicies.RequireSuperAdmin,
                 policy =>
                     policy.RequireRole(
                         MyIdentityConstants.SuperAdmin));
 
             options.AddPolicy(
-                "RequireAdmin",
+                AuthorizationPolicies.RequireAdmin,
                 policy =>
                     policy.RequireRole(
                         MyIdentityConstants.Admin,
                         MyIdentityConstants.SuperAdmin));
 
             options.AddPolicy(
-                "RequireSales",
+                AuthorizationPolicies.RequireSales,
                 policy =>
                     policy.RequireRole(
                         MyIdentityConstants.SalesManager,
                         MyIdentityConstants.SalesExecutive));
 
             options.AddPolicy(
-                "RequireSupport",
+                AuthorizationPolicies.RequireSupport,
                 policy =>
                     policy.RequireRole(
                         MyIdentityConstants.SupportExecutive));
