@@ -10,4 +10,6 @@ public interface ICustomerService
     Task<GetCustomerResponse> GetByIdAsync(Guid id);
 
     Task UpdateAsync(Guid id,UpdateCustomerRequest request);
+
+    Task DeleteAsync(Guid id);
 }

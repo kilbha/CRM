@@ -205,4 +205,18 @@ public class CustomerService : ICustomerService
         customer.ChangeStatus(request.Status);
     }
 
+    public async Task DeleteAsync(Guid id)
+    {
+        var customer = await GetCustomerOrThrowAsync(id);
+
+        customer.MarkAsDeleted();
+
+        await _repository.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "Customer {CustomerCode} deleted.",
+            customer.CustomerCode);
+    }
+
+
 }

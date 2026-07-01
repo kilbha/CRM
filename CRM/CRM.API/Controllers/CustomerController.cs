@@ -24,7 +24,7 @@ public class CustomerController : ControllerBase
 
     [HttpPost]    
     // [AllowAnonymous]
-    [Authorize(Policy = AuthorizationPolicies.RequireSuperAdmin)]
+    [Authorize(Policy = AuthorizationPolicies.RequireSales)]
     [ProducesResponseType(typeof(CreateCustomerResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -58,6 +58,15 @@ public class CustomerController : ControllerBase
         [FromBody] UpdateCustomerRequest request)
     {
         await _customerService.UpdateAsync(id, request);
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id:guid}")]
+    [Authorize(Policy = AuthorizationPolicies.RequireSales)]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        await _customerService.DeleteAsync(id);
 
         return NoContent();
     }
