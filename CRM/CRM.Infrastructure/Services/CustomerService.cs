@@ -1,5 +1,6 @@
 using CRM.Application.Interfaces.Services;
 using CRM.Application.Features.Customers.CreateCustomer;
+using CRM.Application.Features.Customers.UpdateCustomer;
 using CRM.Domain.Entities;
 using CRM.Application.Interfaces.Repositories;
 using Microsoft.Extensions.Logging;
@@ -139,6 +140,69 @@ public class CustomerService : ICustomerService
                 PostalCode = customer.Address.PostalCode
             }
         };
+    }
+
+
+
+    public async Task UpdateAsync(
+    Guid id,
+    UpdateCustomerRequest request)
+    {
+        var customer = await GetCustomerOrThrowAsync(id);
+
+        await EnsureEmailIsAvailableAsync(
+            customer,
+            request.Email);
+
+        UpdateCustomer(customer, request);
+
+        await _repository.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "Customer {CustomerCode} updated successfully.",
+            customer.CustomerCode);
+    }
+
+
+    private async Task EnsureEmailIsAvailableAsync(
+        Customer customer,
+        string email)
+    {
+        if (customer.Email.Equals(email,
+            StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        if (await _repository.ExistsByEmailAsync(email))
+        {
+            throw new Exception(
+                $"Customer with email '{email}' already exists.");
+        }
+    }
+
+    private static void UpdateCustomer(
+    Customer customer,
+    UpdateCustomerRequest request)
+    {
+        customer.UpdateBasicInformation(
+            request.Name,
+            request.Email,
+            request.Phone,
+            request.Company,
+            request.Website);
+
+        customer.ChangeAddress(
+            new Address(
+                request.Address.Street,
+                request.Address.City,
+                request.Address.State,
+                request.Address.Country,
+                request.Address.PostalCode));
+
+        customer.AssignTo(request.AssignedUserId);
+
+        customer.ChangeStatus(request.Status);
     }
 
 }

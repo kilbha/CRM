@@ -57,4 +57,49 @@ public class Customer : BaseEntity
             UpdatedAt = DateTime.UtcNow
         };
     }
+
+    public void UpdateBasicInformation(
+        string name,
+        string email,
+        string phone,
+        string company,
+        string website)
+    {
+        Name = name;
+        Email = email;
+        Phone = phone;
+        Company = company;
+        Website = website;
+
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void ChangeAddress(Address address)
+    {
+        Address = address;
+
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void AssignTo(Guid? userId)
+    {
+        AssignedUserId = userId;
+
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void ChangeStatus(CustomerStatus status)
+    {
+        Status = status;
+
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void MarkAsDeleted()
+    {
+        IsDeleted = true;
+
+        UpdatedAt = DateTime.UtcNow;
+    }
+
 }

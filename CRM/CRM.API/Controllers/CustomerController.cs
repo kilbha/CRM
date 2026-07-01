@@ -3,6 +3,7 @@ using CRM.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using CRM.Application.Common.Authorization;
+using CRM.Application.Features.Customers.UpdateCustomer;
 
 namespace CRM.API.Controllers;
 
@@ -47,11 +48,18 @@ public class CustomerController : ControllerBase
         return Ok();
     }
 
-    [HttpGet("ping")]
-    [Authorize]
-    // [AllowAnonymous]
-    public IActionResult Ping()
+    
+
+    [HttpPut("{id:guid}")]
+    [Authorize(Policy = AuthorizationPolicies.RequireSales)]
+    [AllowAnonymous]
+    public async Task<IActionResult> Update(
+        Guid id,
+        [FromBody] UpdateCustomerRequest request)
     {
-        return Ok("Authenticated");
+        await _customerService.UpdateAsync(id, request);
+
+        return NoContent();
     }
+
 }
