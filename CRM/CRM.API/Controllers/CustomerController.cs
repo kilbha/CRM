@@ -43,16 +43,23 @@ public class CustomerController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
-    public IActionResult GetById(Guid id)
+    [Authorize(Policy = AuthorizationPolicies.RequireSales)]
+    public async Task<IActionResult> GetById(Guid id)
     {
-        return Ok();
+        var customer = await _customerService.GetByIdAsync(id);
+
+        if (customer == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(customer);
     }
 
     
 
     [HttpPut("{id:guid}")]
     [Authorize(Policy = AuthorizationPolicies.RequireSales)]
-    [AllowAnonymous]
     public async Task<IActionResult> Update(
         Guid id,
         [FromBody] UpdateCustomerRequest request)
