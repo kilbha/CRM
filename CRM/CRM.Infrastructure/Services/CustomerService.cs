@@ -1,11 +1,13 @@
 using CRM.Application.Interfaces.Services;
 using CRM.Application.Features.Customers.CreateCustomer;
 using CRM.Application.Features.Customers.UpdateCustomer;
+using CRM.Application.Features.Customers.GetCustomers;
 using CRM.Domain.Entities;
 using CRM.Application.Interfaces.Repositories;
 using Microsoft.Extensions.Logging;
 using CRM.Application.Interfaces.Generators;
 using CRM.Domain.ValueObjects;
+using CRM.Application.Common.Models;
 namespace CRM.Infrastructure.Services;
 
 public class CustomerService : ICustomerService
@@ -216,6 +218,35 @@ public class CustomerService : ICustomerService
         _logger.LogInformation(
             "Customer {CustomerCode} deleted.",
             customer.CustomerCode);
+    }
+
+
+    public async Task<PagedResponse<CustomerListItem>> GetAllAsync(
+    GetCustomersRequest request)
+    {
+        var query = _repository.GetQueryable();
+
+        if (!string.IsNullOrWhiteSpace(request.Search))
+        {
+            query = query.Where(c =>
+                c.Name.Contains(request.Search) ||
+                c.Company.Contains(request.Search) ||
+                c.Email.Contains(request.Search) ||
+                c.CustomerCode.Contains(request.Search));
+        }
+
+        if (request.Status.HasValue)
+        {
+            query = query.Where(c =>
+                c.Status == request.Status.Value);
+        }
+        if (request.Source.HasValue)
+        {
+            query = query.Where(c =>
+                c.Source == request.Source.Value);
+        }
+
+        throw new NotImplementedException();
     }
 
 

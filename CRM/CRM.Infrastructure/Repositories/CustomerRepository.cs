@@ -47,4 +47,11 @@ public class CustomerRepository : ICustomerRepository
     {
         await _context.SaveChangesAsync();
     }
+
+    public IQueryable<Customer> GetQueryable()
+    {
+        return _context.Customers
+            .Where(c => !c.IsDeleted)
+            .AsNoTracking();
+    }
 }

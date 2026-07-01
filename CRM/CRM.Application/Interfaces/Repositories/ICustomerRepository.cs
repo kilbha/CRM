@@ -13,4 +13,6 @@ public interface ICustomerRepository
     Task<bool> ExistsByEmailAsync(string email);
 
     Task SaveChangesAsync();
+
+    IQueryable<Customer> GetQueryable();
 }
