@@ -12,3 +12,26 @@ sudo snap install azuredatastudio
 dotnet ef database update \
 --project CRM.Infrastructure \
 --startup-project CRM.API
+
+
+SELECT * FROM Customers;
+
+{
+  "id": "...",
+  "customerCode": "CUS-000001",
+  "name": "Microsoft",
+  "email": "contact@microsoft.com",
+  "phone": "9876543210",
+  "company": "Microsoft",
+  "website": "https://microsoft.com",
+  "status": "Active",
+  "source": "Website",
+  "assignedUserId": null,
+  "address": {
+    "street": "MG Road",
+    "city": "Hyderabad",
+    "state": "Telangana",
+    "country": "India",
+    "postalCode": "500001"
+  }
+}

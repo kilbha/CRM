@@ -48,3 +48,4 @@ CRM/azuredatastudio.deb
 CRM/CRM.Infrastructure/Persistence/Migrations
 CRM/CRM.Application/Features/Authentication/Register/TESTCASES
 CRM/CRM.API/Logs/log-20260629.txt
+CRM/CRM.API/Logs/

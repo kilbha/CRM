@@ -2,7 +2,12 @@ using CRM.Infrastructure;
 using CRM.Infrastructure.Identity;
 using CRM.API.Extensions;
 using Serilog;
-
+using CRM.Application.Interfaces.Repositories;
+using CRM.Infrastructure.Repositories;
+using CRM.Application.Interfaces.Generators;
+using CRM.Infrastructure.Generators;
+using CRM.Application.Interfaces.Services;
+using CRM.Infrastructure.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -15,6 +20,8 @@ builder.Services.AddSwaggerDocumentation();
 
 builder.Services.AddInfrastructure(builder.Configuration);
 
+
+
 // Logger configuration
 builder.Host.UseSerilog((context, services, configuration) =>
 {
@@ -23,8 +30,6 @@ builder.Host.UseSerilog((context, services, configuration) =>
 
 
 var app = builder.Build();
-
-
 
 
 // Configure the HTTP request pipeline.

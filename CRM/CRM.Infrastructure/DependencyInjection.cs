@@ -12,6 +12,13 @@ using CRM.Infrastructure.Configuration;
 using CRM.Application.Features.Authentication.Interfaces;
 using MyIdentityConstants = CRM.Infrastructure.Identity.IdentityConstants;
 using CRM.Application.Common.Authorization;
+using System.Security.Claims;
+using CRM.Application.Interfaces.Repositories;
+using CRM.Infrastructure.Repositories;
+using CRM.Application.Interfaces.Generators;
+using CRM.Infrastructure.Generators;
+using CRM.Application.Interfaces.Services;
+using CRM.Infrastructure.Services;
 
 namespace CRM.Infrastructure;
 
@@ -45,16 +52,19 @@ public static class DependencyInjection
             .GetSection(JwtSettings.SectionName)
             .Get<JwtSettings>()!;
 
-        services
-        .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        services.AddAuthentication(options => {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
         .AddJwtBearer(options =>
         {
             options.TokenValidationParameters =
                 new TokenValidationParameters
                 {
-                    ValidateIssuer = true,
+                    ValidateIssuer = false,
 
-                    ValidateAudience = true,
+                    ValidateAudience = false,
 
                     ValidateLifetime = true,
 
@@ -66,8 +76,12 @@ public static class DependencyInjection
 
                     IssuerSigningKey =
                         new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes(jwtSettings.Secret))
+                            Encoding.UTF8.GetBytes(jwtSettings.Secret)),
+                    // NameClaimType = ClaimTypes.Name,
+                    // RoleClaimType = ClaimTypes.Role
                 };
+
+            
         });
 
 
@@ -111,6 +125,10 @@ public static class DependencyInjection
                     policy.RequireRole(
                         MyIdentityConstants.SupportExecutive));
         });
+
+        services.AddScoped<ICustomerRepository, CustomerRepository>();
+        services.AddScoped<ICustomerCodeGenerator, CustomerCodeGenerator>();
+        services.AddScoped<ICustomerService, CustomerService>();
 
 
         return services;

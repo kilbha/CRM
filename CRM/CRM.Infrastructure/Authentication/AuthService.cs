@@ -127,6 +127,9 @@ public class AuthService : IAuthService
 
         var roles = await GetUserRolesAsync(user);
 
+        _logger.LogInformation("User '{Email}' logged in with roles: {Roles}",
+            user.Email, string.Join(", ", roles));
+
         var jwt = _jwtTokenGenerator.GenerateToken(user, roles);
 
         await UpdateLastLoginAsync(user);

@@ -1,0 +1,10 @@
+| Test                       | Expected                                 |
+| -------------------------- | ---------------------------------------- |
+| Valid customer             | 201 Created                              |
+| Duplicate email            | Exception handled correctly              |
+| Invalid JWT                | 401 Unauthorized                         |
+| User without required role | 403 Forbidden                            |
+| Get existing customer      | 200 OK                                   |
+| Get unknown customer       | 404 (or your current exception response) |
+| Customer code generation   | CUS-000001, CUS-000002, ...              |
+| Database row               | Created successfully                     |
