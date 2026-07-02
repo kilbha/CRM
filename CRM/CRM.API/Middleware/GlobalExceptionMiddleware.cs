@@ -1,7 +1,7 @@
 using System.Net;
 using System.Text.Json;
 using CRM.Shared.Exceptions;
-using CRM.Shared.Responses;
+using CRM.API.Models;
 
 namespace CRM.API.Middleware;
 

@@ -8,6 +8,12 @@ using CRM.Application.Interfaces.Generators;
 using CRM.Infrastructure.Generators;
 using CRM.Application.Interfaces.Services;
 using CRM.Infrastructure.Services;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using CRM.Application;
+using Microsoft.AspNetCore.Mvc;
+using CRM.API.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -15,6 +21,37 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 
 builder.Services.AddControllers();
+
+builder.Services.AddFluentValidationAutoValidation();
+
+builder.Services.AddValidatorsFromAssemblyContaining<ApplicationAssemblyMarker>();
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var errors = context.ModelState
+            .Where(x => x.Value?.Errors.Count > 0)
+            .ToDictionary(
+                x => x.Key,
+                x => x.Value!.Errors
+                    .Select(e => e.ErrorMessage)
+                    .ToArray());
+
+        var response = new ValidationErrorResponse
+        {
+            StatusCode = StatusCodes.Status400BadRequest,
+
+            Message = "Validation Failed",
+
+            Errors = errors,
+
+            TraceId = context.HttpContext.TraceIdentifier
+        };
+
+        return new BadRequestObjectResult(response);
+    };
+});
 
 builder.Services.AddSwaggerDocumentation();
 

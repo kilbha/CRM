@@ -228,11 +228,7 @@ public class CustomerService : ICustomerService
     GetCustomersRequest request)
     {
 
-        if (request.Page < 1)
-            throw new BadRequestException("Page must be greater than 0.");
-
-        if (request.PageSize < 1 || request.PageSize > 100)
-            throw new BadRequestException("PageSize must be between 1 and 100.");
+    
         var query = _repository.GetQueryable();        
 
         query = ApplySearch(query, request);

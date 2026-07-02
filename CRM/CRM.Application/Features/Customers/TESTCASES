@@ -8,3 +8,18 @@
 | Get unknown customer       | 404 (or your current exception response) |
 | Customer code generation   | CUS-000001, CUS-000002, ...              |
 | Database row               | Created successfully                     |
+
+
+Customer
+│
+├── Create ✅
+├── Update ✅
+├── Delete ✅
+├── Get By Id ✅
+├── Get All ✅
+│
+├── Activate
+├── Deactivate
+├── Assign Salesperson
+├── Change Status
+└── Timeline
