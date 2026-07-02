@@ -8,6 +8,9 @@ using Microsoft.Extensions.Logging;
 using CRM.Application.Interfaces.Generators;
 using CRM.Domain.ValueObjects;
 using CRM.Application.Common.Models;
+using Microsoft.EntityFrameworkCore;
+using CRM.Shared.Exceptions;
+
 namespace CRM.Infrastructure.Services;
 
 public class CustomerService : ICustomerService
@@ -224,30 +227,144 @@ public class CustomerService : ICustomerService
     public async Task<PagedResponse<CustomerListItem>> GetAllAsync(
     GetCustomersRequest request)
     {
-        var query = _repository.GetQueryable();
 
-        if (!string.IsNullOrWhiteSpace(request.Search))
-        {
-            query = query.Where(c =>
-                c.Name.Contains(request.Search) ||
-                c.Company.Contains(request.Search) ||
-                c.Email.Contains(request.Search) ||
-                c.CustomerCode.Contains(request.Search));
+        if (request.Page < 1)
+            throw new BadRequestException("Page must be greater than 0.");
+
+        if (request.PageSize < 1 || request.PageSize > 100)
+            throw new BadRequestException("PageSize must be between 1 and 100.");
+        var query = _repository.GetQueryable();        
+
+        query = ApplySearch(query, request);
+
+        query = ApplyFilters(query, request);
+
+        query = ApplySorting(query, request);
+
+        var totalCount = await query.CountAsync();
+
+        query = ApplyPaging(query, request);
+
+        var customers = await ProjectCustomersAsync(query);
+
+        return BuildPagedResponse(
+            customers,
+            request,
+            totalCount);
         }
 
+
+    private static IQueryable<Customer> ApplySearch(
+        IQueryable<Customer> query,
+        GetCustomersRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Search))
+        {
+            return query;
+        }
+        
+        
+        return query.Where(c =>
+            c.Name.Contains(request.Search) ||
+            c.Company.Contains(request.Search) ||
+            c.Email.Contains(request.Search) ||
+            c.CustomerCode.Contains(request.Search));
+    }
+
+    private static IQueryable<Customer> ApplyFilters(
+        IQueryable<Customer> query,
+        GetCustomersRequest request)
+    {
+        
         if (request.Status.HasValue)
         {
             query = query.Where(c =>
                 c.Status == request.Status.Value);
         }
+
         if (request.Source.HasValue)
         {
             query = query.Where(c =>
                 c.Source == request.Source.Value);
         }
 
-        throw new NotImplementedException();
+        if (request.AssignedUserId.HasValue)
+        {
+            query = query.Where(c =>
+                c.AssignedUserId == request.AssignedUserId.Value);
+        }
+
+        return query;
+    }
+
+    private static IQueryable<Customer> ApplySorting(
+        IQueryable<Customer> query,
+        GetCustomersRequest request)
+    {
+        
+        return request.SortBy.ToLower() switch
+        {
+            "name" => request.Descending
+                ? query.OrderByDescending(c => c.Name)
+                : query.OrderBy(c => c.Name),
+
+            "company" => request.Descending
+                ? query.OrderByDescending(c => c.Company)
+                : query.OrderBy(c => c.Company),
+
+            _ => request.Descending
+                ? query.OrderByDescending(c => c.CreatedAt)
+                : query.OrderBy(c => c.CreatedAt)
+        };
+    }
+
+    private static IQueryable<Customer> ApplyPaging(
+        IQueryable<Customer> query,
+        GetCustomersRequest request)
+    {
+        
+        return query
+            .Skip((request.Page - 1) * request.PageSize)
+            .Take(request.PageSize);
+    }
+
+    private static Task<List<CustomerListItem>> ProjectCustomersAsync(
+    IQueryable<Customer> query)
+    {
+        
+        return query
+            .Select(c => new CustomerListItem
+            {
+                Id = c.Id,
+                CustomerCode = c.CustomerCode,
+                Name = c.Name,
+                Company = c.Company,
+                Email = c.Email,
+                Phone = c.Phone,
+                Status = c.Status,
+                Source = c.Source
+            })
+            .ToListAsync();
     }
 
 
+    private static PagedResponse<CustomerListItem> BuildPagedResponse(
+        IReadOnlyList<CustomerListItem> customers,
+        GetCustomersRequest request,
+        int totalCount)
+    {
+        return new PagedResponse<CustomerListItem>
+        {
+            Items = customers,
+
+            Page = request.Page,
+
+            PageSize = request.PageSize,
+
+            TotalCount = totalCount,
+
+            TotalPages = (int)Math.Ceiling(
+                totalCount / (double)request.PageSize)
+        };
+    }
 }

@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using CRM.Application.Common.Authorization;
 using CRM.Application.Features.Customers.UpdateCustomer;
+using CRM.Application.Common.Models;
+using CRM.Application.Features.Customers.GetCustomers;
 
 namespace CRM.API.Controllers;
 
@@ -76,6 +78,20 @@ public class CustomerController : ControllerBase
         await _customerService.DeleteAsync(id);
 
         return NoContent();
+    }
+
+    [HttpGet]
+    [Authorize(Policy = AuthorizationPolicies.RequireSales)]
+    [ProducesResponseType(
+        typeof(PagedResponse<CustomerListItem>),
+        StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAll(
+        [FromQuery] GetCustomersRequest request)
+    {
+        var response =
+            await _customerService.GetAllAsync(request);
+
+        return Ok(response);
     }
 
 }
