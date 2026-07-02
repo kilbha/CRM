@@ -90,6 +90,17 @@ public class Customer : BaseEntity
 
     public void ChangeStatus(CustomerStatus status)
     {
+        if (IsDeleted)
+        {
+            throw new InvalidOperationException(
+                "Deleted customers cannot change status.");
+        }
+
+        if (Status == status)
+        {
+            return;
+        }
+
         Status = status;
 
         UpdatedAt = DateTime.UtcNow;
@@ -100,6 +111,16 @@ public class Customer : BaseEntity
         IsDeleted = true;
 
         UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void Activate()
+    {
+        ChangeStatus(CustomerStatus.Active);
+    }
+
+    public void Deactivate()
+    {
+        ChangeStatus(CustomerStatus.Inactive);
     }
 
 }

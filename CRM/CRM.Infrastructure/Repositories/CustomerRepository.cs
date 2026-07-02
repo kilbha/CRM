@@ -54,4 +54,9 @@ public class CustomerRepository : ICustomerRepository
             .Where(c => !c.IsDeleted)
             .AsNoTracking();
     }
+
+    public void UpdateAsync(Customer customer)
+    {
+        _context.Customers.Update(customer);
+    }
 }

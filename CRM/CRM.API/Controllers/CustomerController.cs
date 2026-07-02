@@ -6,6 +6,8 @@ using CRM.Application.Common.Authorization;
 using CRM.Application.Features.Customers.UpdateCustomer;
 using CRM.Application.Common.Models;
 using CRM.Application.Features.Customers.GetCustomers;
+using CRM.Application.Features.Customers.ActivateCustomer;
+using CRM.Application.Features.Customers.DeactivateCustomer;
 
 namespace CRM.API.Controllers;
 
@@ -90,6 +92,40 @@ public class CustomerController : ControllerBase
     {
         var response =
             await _customerService.GetAllAsync(request);
+
+        return Ok(response);
+    }
+
+    [HttpPatch("{id:guid}/activate")]
+    [Authorize(Policy = AuthorizationPolicies.RequireSales)]
+    [ProducesResponseType(
+        typeof(ActivateCustomerResponse),
+        StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Activate(Guid id)
+    {
+        var response = await _customerService.ActivateAsync(
+            new ActivateCustomerRequest
+            {
+                CustomerId = id
+            });
+
+        return Ok(response);
+    }
+
+    [HttpPatch("{id:guid}/deactivate")]
+    [Authorize(Policy = AuthorizationPolicies.RequireSales)]
+    [ProducesResponseType(
+        typeof(DeactivateCustomerResponse),
+        StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Deactivate(Guid id)
+    {
+        var response = await _customerService.DeactivateAsync(
+            new DeactivateCustomerRequest
+            {
+                CustomerId = id
+            });
 
         return Ok(response);
     }

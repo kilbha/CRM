@@ -15,4 +15,6 @@ public interface ICustomerRepository
     Task SaveChangesAsync();
 
     IQueryable<Customer> GetQueryable();
+
+    void UpdateAsync(Customer customer);
 }

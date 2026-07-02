@@ -10,6 +10,8 @@ using CRM.Domain.ValueObjects;
 using CRM.Application.Common.Models;
 using Microsoft.EntityFrameworkCore;
 using CRM.Shared.Exceptions;
+using CRM.Application.Features.Customers.ActivateCustomer;
+using CRM.Application.Features.Customers.DeactivateCustomer;
 
 namespace CRM.Infrastructure.Services;
 
@@ -363,4 +365,42 @@ public class CustomerService : ICustomerService
                 totalCount / (double)request.PageSize)
         };
     }
+
+    public async Task<ActivateCustomerResponse> ActivateAsync(
+        ActivateCustomerRequest request)
+    {        
+        var customer = await GetCustomerOrThrowAsync(request.CustomerId);
+
+        customer.Activate();
+
+        _repository.UpdateAsync(customer);
+        await _repository.SaveChangesAsync();
+
+        return new ActivateCustomerResponse
+        {
+            CustomerId = customer.Id,
+            Status = customer.Status,
+            Message = "Customer activated successfully."
+        };
+    }
+
+    public async Task<DeactivateCustomerResponse> DeactivateAsync(
+        DeactivateCustomerRequest request)
+    {
+        var customer = await GetCustomerOrThrowAsync(request.CustomerId);
+
+        customer.Deactivate();
+
+        _repository.UpdateAsync(customer);
+
+        await _repository.SaveChangesAsync();
+
+        return new DeactivateCustomerResponse
+        {
+            CustomerId = customer.Id,
+            Status = customer.Status,
+            Message = "Customer deactivated successfully."
+        };
+    }
+
 }
